@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gohtmx-do-k8s
+  labels:
+    app: gohtmx-do-k8s
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gohtmx-do-k8s
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: gohtmx-do-k8s
+    spec:
+      containers:
+      - name: gohtmx-do-k8s
+        image: <IMAGE>
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gohtmx-do-k8s-service
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: gohtmx-do-k8s
