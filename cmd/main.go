@@ -9,13 +9,19 @@ import (
 
 func main() {
 	app := echo.New()
-	localUserStore := model.NewLocalUserStore()
 
-	userHandler := handler.UserHandler{
-		Store: localUserStore,
+	localChatStore := model.NewLocalChatStore()
+
+	userHandler := handler.UserHandler{}
+	chatHandler := handler.ChatHandler{
+		Store: localChatStore,
 	}
 
-	app.GET("/", userHandler.HandlePage)
-	app.POST("/user", userHandler.HandleAdd)
+	app.GET("/", userHandler.HandleUserLoginPage)
+	app.POST("/login", userHandler.HandleUserLogin)
+
+	app.GET("/chat", chatHandler.HandleChatPage)
+	app.POST("/chat", chatHandler.HandleCreateMessage)
+
 	app.Start(":80")
 }

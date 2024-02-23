@@ -1,29 +1,40 @@
 package handler
 
 import (
-	"gohtmx/model"
+	"net/http"
+	"strings"
 	"text/template"
 
 	"github.com/labstack/echo/v4"
 )
 
 type UserHandler struct {
-	Store model.UserStore
 }
 
-func (h *UserHandler) HandlePage(c echo.Context) error {
-	users := h.Store.FindAll()
-	tmpl := template.Must(template.ParseFiles("view/index.html"))
-	return tmpl.Execute(c.Response(), map[string][]*model.User{
-		"Users": users,
+func (h *UserHandler) HandleUserLoginPage(c echo.Context) error {
+	cookie, err := c.Cookie("user")
+
+	if err != nil || cookie.Value == "" {
+		tmpl := template.Must(template.ParseFiles("view/index.html"))
+		return tmpl.Execute(c.Response(), nil)
+	}
+
+	return c.Redirect(http.StatusFound, "/chat")
+}
+
+func (h *UserHandler) HandleUserLogin(c echo.Context) error {
+	user := c.FormValue("user")
+
+	user = strings.Trim(user, " ")
+
+	if user == "" {
+		return c.Redirect(http.StatusFound, "/")
+	}
+
+	c.SetCookie(&http.Cookie{
+		Name:  "user",
+		Value: user,
 	})
-}
 
-func (h *UserHandler) HandleAdd(c echo.Context) error {
-	email := c.FormValue("email")
-	user := model.NewUser(email)
-	createdUser, _ := h.Store.Create(user)
-
-	tmpl := template.Must(template.ParseFiles("view/index.html"))
-	return tmpl.ExecuteTemplate(c.Response(), "list-item", createdUser)
+	return c.Redirect(http.StatusFound, "/chat")
 }
