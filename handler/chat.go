@@ -2,6 +2,7 @@ package handler
 
 import (
 	"gohtmx/model"
+	"html"
 	"net/http"
 	"strings"
 	"text/template"
@@ -37,6 +38,7 @@ func (h *ChatHandler) HandleCreateMessage(c echo.Context) error {
 
 	content := c.FormValue("content")
 	content = strings.Trim(content, " ")
+	content = html.EscapeString(content)
 
 	message := model.NewMessage(cookie.Value, content)
 	createdMessage, _ := h.Store.Create(message)
