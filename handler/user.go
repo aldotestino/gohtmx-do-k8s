@@ -26,6 +26,7 @@ func (h *UserHandler) HandleUserLogin(c echo.Context) error {
 	user := c.FormValue("user")
 
 	user = strings.Trim(user, " ")
+	user = template.HTMLEscapeString(user)
 
 	if user == "" {
 		return c.Redirect(http.StatusFound, "/")
