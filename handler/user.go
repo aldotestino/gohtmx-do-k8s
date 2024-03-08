@@ -33,8 +33,10 @@ func (h *UserHandler) HandleUserLogin(c echo.Context) error {
 	}
 
 	c.SetCookie(&http.Cookie{
-		Name:  "user",
-		Value: user,
+		Name:     "user",
+		Value:    user,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	return c.Redirect(http.StatusFound, "/chat")
